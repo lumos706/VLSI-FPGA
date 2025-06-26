@@ -123,5 +123,6 @@ g++ -std=c++17 -o main main.cpp Design.cpp FPGA.cpp FpgaTile.cpp Net.cpp RRNode.
 - [FPGA布线问题维基百科](https://en.wikipedia.org/wiki/FPGA_routing)
 - 实验配套代码和注释
 - FPGA结构与Wilton拓扑讲义
-
+- 课程网站 [链接](https://customized-computing.github.io/VLSI-FPGA/#/lab3/lab3_problem)
+  
 ---

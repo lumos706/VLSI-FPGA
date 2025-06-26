@@ -14,7 +14,7 @@
 │   └── README.md
 ├── lab3/            # 实验3：FPGA布线算法
 │   └── README.md
-├── project/         # 大作业：FPGA Routing加速与优化
+├── labFinal/         # 大作业：FPGA Routing加速与优化
 │   └── README.md
 └── README.md        # 本总览文档
 ```
@@ -54,7 +54,7 @@
 - **功能**：支持三组对比实验（Baseline、Optimized、Width+30%），自动化批量测试、性能数据采集与图表绘制。
 - **评测指标**：最小可行通道宽度、segments数、运行时间、加速比、内存峰值等。
 - **复现流程**：见 `labFinal/README.md`，涵盖源码切换、自动化脚本、结果采集与绘图全流程。
-- **分析与结论**：见课程论文Congestion-Aware Parallel Routing for FPGAs-Achieving Superlinear Speedups and Resource Efficiency.pdf。
+- **分析与结论**：见课程论文 Congestion-Aware Parallel Routing for FPGAs_ Achieving Superlinear Speedups and Resource Efficiency.pdf。
 
 ---
 

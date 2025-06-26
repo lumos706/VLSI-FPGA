@@ -104,7 +104,7 @@ g++ -std=c++17 -o main main.cpp Arch.cpp Global.cpp Object.cpp Solution.cpp
 
 ## 参考
 
-- [VLSI-FPGA 官方仓库说明](https://github.com/Customized-Computing/VLSI-FPGA/tree/main/lab2)
+- 课程网站 [链接](https://customized-computing.github.io/VLSI-FPGA/#/lab2/lab2_problem)
 - 助教提供的初始代码结构与注释
 - [FPGA Layout 问题简介（英文）](https://en.wikipedia.org/wiki/Placement_(EDA))
 

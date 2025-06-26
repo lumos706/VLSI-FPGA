@@ -142,5 +142,6 @@ done
 
 - 初始代码结构说明见项目注释
 - ISPD benchmark 详见 [ISPD Benchmark 官网](https://www2.eecs.berkeley.edu/Research/Projects/CS/eda/benchmarks/ispd98.html)
-
+- 课程网站 [链接](https://customized-computing.github.io/VLSI-FPGA/#/lab1/lab1_problem)
+  
 ---

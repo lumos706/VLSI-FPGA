@@ -162,7 +162,7 @@ tiny,8,0.0842,1.91,63,104.00 KB
 详细实验分析与对比图表见论文：
 
 ```
-Congestion-Aware Parallel Routing for FPGAs-Achieving Superlinear Speedups and Resource Efficiency.pdf
+Congestion-Aware Parallel Routing for FPGAs_ Achieving Superlinear Speedups and Resource Efficiency.pdf
 ```
 
 核心代码与实验设计均由本人独立完成,如需复现实验，请严格按照上述流程依次执行并记录中间结果，以保证可比性与数据一致性。如遇环境配置、路径错误等问题可根据报错信息联系开发者。
