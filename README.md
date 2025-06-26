@@ -53,7 +53,7 @@
 - **内容**：基于实验三，系统性探索路由算法的性能优化与并行加速，包括拥塞感知代价、失败自适应重试、并行策略等。
 - **功能**：支持三组对比实验（Baseline、Optimized、Width+30%），自动化批量测试、性能数据采集与图表绘制。
 - **评测指标**：最小可行通道宽度、segments数、运行时间、加速比、内存峰值等。
-- **复现流程**：见 `project/README.md`，涵盖源码切换、自动化脚本、结果采集与绘图全流程。
+- **复现流程**：见 `labFinal/README.md`，涵盖源码切换、自动化脚本、结果采集与绘图全流程。
 - **分析与结论**：见课程论文Congestion-Aware Parallel Routing for FPGAs-Achieving Superlinear Speedups and Resource Efficiency.pdf。
 
 ---
