@@ -1,0 +1,3 @@
+31
+59157
+Routing time: 118818 ms

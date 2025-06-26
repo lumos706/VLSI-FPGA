@@ -1,0 +1,3 @@
+20
+3424
+Routing time: 557 ms

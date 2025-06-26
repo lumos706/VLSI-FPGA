@@ -1,0 +1,3 @@
+37
+14807
+Routing time: 8903 ms

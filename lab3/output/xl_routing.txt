@@ -1,0 +1,3 @@
+27
+26327
+Routing time: 43871 ms
