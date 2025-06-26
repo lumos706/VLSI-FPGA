@@ -4,7 +4,7 @@
 #include <string>
 #include <regex>
 #include <sstream>
-
+#include <filesystem>
 #include "Design.h"
 #include "FPGA.h"
 #include "FpgaTile.h"
@@ -19,6 +19,16 @@ using namespace std;
 */
 
 int main(int argc, char *argv[]) {
+    std::string output_dir = "./output";
+
+    // 检查output文件夹是否存在
+    if (!std::filesystem::exists(output_dir)) {
+        // 如果不存在，创建文件夹
+        std::filesystem::create_directories(output_dir);
+        std::cout << "Output directory created." << std::endl;
+    } else {
+        std::cout << "Output directory already exists." << std::endl;
+    }
     assert(argc == 3);
     bool printNets = false;
 

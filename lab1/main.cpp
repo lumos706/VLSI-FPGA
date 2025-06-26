@@ -60,12 +60,21 @@ int main(int argc, char **argv) {
     // 1. finish your partition algorithm
     // 2. output your partition result to a file
     // 3. evaluate your partition result
+    std::string output_dir = "./output";
 
+    // 检查output文件夹是否存在
+    if (!std::filesystem::exists(output_dir)) {
+        // 如果不存在，创建文件夹
+        std::filesystem::create_directories(output_dir);
+        std::cout << "Output directory created." << std::endl;
+    } else {
+        std::cout << "Output directory already exists." << std::endl;
+    }
     unordered_set<int> X, Y;
 
     solution.my_partition_algorithm(graph, X, Y);
-    // 输出划分结果到文件
-    string output_file = "C:/Users/10559/Desktop/Study/Three/VLSI-FPGA/lab1/output/ibm17_partition.txt";
+    // 输出划分结果到文件（自己改）
+    string output_file = "./output/ibm17_partition.txt";
     ofstream outfile(output_file);
     if (!outfile.is_open()) {
         cerr << "Failed to open output file: " << output_file << endl;
@@ -84,8 +93,8 @@ int main(int argc, char **argv) {
 }
 
 // int main() {
-//     string benchmark_dir = "C:/Users/10559/Desktop/Study/Three/VLSI-FPGA/lab1/benchmark";
-//     string output_dir = "C:/Users/10559/Desktop/Study/Three/VLSI-FPGA/lab1/output";
+//     string benchmark_dir = "./benchmark";
+//     string output_dir = "./output";
 
 //     evaluate_all_benchmarks(benchmark_dir, output_dir);
 

@@ -4,6 +4,7 @@
 #include <unordered_set>
 #include <vector>
 #include <iostream>
+#include <filesystem>
 #include <fstream>
 #include <string>
 #include <chrono>
@@ -11,6 +12,16 @@
 #include "Solution.h"
 
 int main(int argv, char** argc){
+    std::string output_dir = "./output";
+
+    // 检查output文件夹是否存在
+    if (!std::filesystem::exists(output_dir)) {
+        // 如果不存在，创建文件夹
+        std::filesystem::create_directories(output_dir);
+        std::cout << "Output directory created." << std::endl;
+    } else {
+        std::cout << "Output directory already exists." << std::endl;
+    }
     if (argv != 3){
         std::printf("usage: ./main benchmark.txt output.txt\n");
         return -2;

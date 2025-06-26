@@ -120,7 +120,7 @@ done
    使用 `evaluate.cpp` 提供的 `calculate_cut` 或 `evaluate` 函数，统计每个划分的割代价。
 
 5. **与最优解对比**  
-   参考 `UBfactor2/` 目录下的对应文件（如 `ibm01_ub.txt`），比较你的划分割代价与最优解的距离。
+   参考 `UBfactor2/` 目录下的对应文件（[下载地址](https://github.com/TILOS-AI-Institute/HypergraphPartitioning/tree/main/K_specpart_solutions/ISPD_benchmarks/ub_factor_2/2_way)），比较你的划分割代价与最优解的距离。
 
 6. **结果整理**  
    将所有数据集的割代价、最优解及误差整理为表格，写入实验报告。
