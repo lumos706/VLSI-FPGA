@@ -4,14 +4,14 @@ import csv
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 test_cases = [
-    ".\\circuits\\tiny",
-    ".\\circuits\\small_dense",
-    ".\\circuits\\med_sparse",
-    ".\\circuits\\med_dense",
-    ".\\circuits\\lg_sparse",
-    ".\\circuits\\large_dense",
-    ".\\circuits\\xl",
-    ".\\circuits\\huge",
+    "..\\circuits\\tiny",
+    "..\\circuits\\small_dense",
+    "..\\circuits\\med_sparse",
+    "..\\circuits\\med_dense",
+    "..\\circuits\\lg_sparse",
+    "..\\circuits\\large_dense",
+    "..\\circuits\\xl",
+    "..\\circuits\\huge",
 ]
 
 special_cases_start_width = {
@@ -28,7 +28,7 @@ special_cases_start_width = {
 max_retries = 10
 max_width = 100
 num_threads = 1  # 固定使用1个线程测试W
-exe_path = ".\\main2.exe"
+exe_path = "../main.exe"
 
 def test_min_width(test_case):
     base_name = test_case.split("\\")[-1]

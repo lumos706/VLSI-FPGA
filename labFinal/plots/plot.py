@@ -15,9 +15,9 @@ plt.rcParams.update({
 })
 
 # 读取数据
-df_base = pd.read_csv("results.csv")
-df_impr = pd.read_csv("results2.csv")
-df_plus30 = pd.read_csv("results3.csv")
+df_base = pd.read_csv("../results/results.csv")
+df_impr = pd.read_csv("../results/results2.csv")
+df_plus30 = pd.read_csv("../results/results3.csv")
 
 df_base['Algorithm'] = 'Baseline'
 df_impr['Algorithm'] = 'Improved'

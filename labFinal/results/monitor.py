@@ -37,32 +37,37 @@ def monitorThread(pid, flag):
             break
     return max_children, max_mem
 
-# 输入配置
-# test_cases = [
-#     ".\\circuits\\tiny",
-#     ".\\circuits\\small_dense",
-#     ".\\circuits\\med_sparse",
-#     ".\\circuits\\med_dense",
-#     ".\\circuits\\lg_sparse",
-#     ".\\circuits\\large_dense",
-#     ".\\circuits\\xl",
-#     ".\\circuits\\huge",
-# ]
-
+# 输入配置（results/results2.csv）
 test_cases = [
-    ".\\circuits\\small_dense",
-    ".\\circuits\\med_dense",
-    ".\\circuits\\large_dense",
-    ".\\circuits\\xl",
-    ".\\circuits\\huge",
+    "..\\circuits\\tiny",
+    "..\\circuits\\small_dense",
+    "..\\circuits\\med_sparse",
+    "..\\circuits\\med_dense",
+    "..\\circuits\\lg_sparse",
+    "..\\circuits\\large_dense",
+    "..\\circuits\\xl",
+    "..\\circuits\\huge",
 ]
-channel_widths = [5, 22, 39, 35, 49]
-# 3, 4, 7, 17, 9, 30, 27, 38
-# thread_settings = [1, 2, 4, 8]
-thread_settings = [1]
+
+# channel_widths = [3, 6, 7, 20, 11, 37, 27, 31] #原算法(results.csv)
+channel_widths = [3, 4, 7, 17, 9, 30, 27, 38] #优化算法(results2.csv)
+thread_settings = [1, 2, 4, 8]  # 多线程设置
+
+# 输入配置（results3.csv）
+# test_cases = [
+#     "..\\circuits\\small_dense",
+#     "..\\circuits\\med_dense",
+#     "..\\circuits\\large_dense",
+#     "..\\circuits\\xl",
+#     "..\\circuits\\huge",
+# ]
+# channel_widths = [5, 22, 39, 35, 49]
+# thread_settings = [1]
+
+
 pool = ThreadPoolExecutor()
 
-with open("results3.csv", "w", newline="") as csvfile:
+with open("results2.csv", "w", newline="") as csvfile:
     fieldnames = ['test_case', 'threads', 'time_sec', 'acceleration_ratio', 'segments_used', 'peak_memory']
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
     writer.writeheader()
@@ -75,7 +80,7 @@ with open("results3.csv", "w", newline="") as csvfile:
             retries = 0
             while not success:
                 cmd = [
-                    "./main2.exe",
+                    "../main.exe",
                     test_case, str(width), str(threads)
                 ]
                 print(f"Running: {cmd}")
