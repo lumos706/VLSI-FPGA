@@ -7,22 +7,29 @@
 #include <queue>
 #include <cmath>
 #include <unordered_set>
-
 #include <vector>
 #include <map>  // 稀疏矩阵求解器
 
+/**
+ * Solution::initializePlacement
+ * 功能：初始化模块布局，将未固定的模块放置到 FPGA 的最佳位置。
+ * 逻辑：
+ * 1. 遍历所有模块，筛选出未固定的模块。
+ * 2. 对每个未固定模块，选择连接密度最大的模块。
+ * 3. 对选定模块，尝试所有空位置，计算代价（总线长），选择代价最小的位置。
+ * 4. 将模块放置到最佳位置，并从未布局集合中移除。
+ */
 void Solution::initializePlacement() {
-    // 初始化未布局模块集合
-    std::unordered_set<int> unplacedModules;
+    std::unordered_set<int> unplacedModules; // 未布局模块集合
     for (const auto& [id, inst] : glb_inst_map) {
-        if (!inst->isFixed()) {
+        if (!inst->isFixed())
+        { // 筛选未固定模块
             unplacedModules.insert(id);
         }
     }
 
-    // 初始化布局
     while (!unplacedModules.empty()) {
-        // 1. 选择连接密度最大的模块
+        // 选择连接密度最大的模块
         int selectedModule = -1;
         int maxConnectionDensity = -1;
 
@@ -32,111 +39,111 @@ void Solution::initializePlacement() {
             for (Net* net : inst->getNets()) {
                 for (Instance* connectedInst : net->getInsts()) {
                     if (unplacedModules.find(connectedInst->getInstId()) == unplacedModules.end()) {
-                        connectionDensity++;
+                        connectionDensity++; // 计算连接密度
                     }
                 }
             }
             if (connectionDensity > maxConnectionDensity) {
                 maxConnectionDensity = connectionDensity;
-                selectedModule = moduleId;
+                selectedModule = moduleId; // 更新连接密度最大的模块
             }
         }
 
-        // 2. 选择代价最小的位置
+        // 选择代价最小的位置
         Instance* selectedInst = glb_inst_map[selectedModule];
         std::pair<int, int> bestPosition = {-1, -1};
         int minCost = std::numeric_limits<int>::max();
 
         for (int x = 0; x < glb_fpga.getSizeX(); ++x) {
             for (int y = 0; y < glb_fpga.getSizeY(); ++y) {
-                if (glb_fpga.getBlock(x, y)->getInstsCount() == 0) { // 位置为空
-                    // 尝试放置模块
-                    glb_fpga.addInst(x, y, selectedInst);
+                if (glb_fpga.getBlock(x, y)->getInstsCount() == 0)
+                {                                         // 检查位置是否为空
+                    glb_fpga.addInst(x, y, selectedInst); // 尝试放置模块
                     selectedInst->setPosition(x, y);
 
-                    // 计算代价（目标函数）
-                    int cost = reportWireLength();
+                    int cost = reportWireLength(); // 计算代价（总线长）
 
-                    // 更新最优位置
-                    if (cost < minCost) {
+                    if (cost < minCost)
+                    { // 更新最优位置
                         minCost = cost;
                         bestPosition = {x, y};
                     }
 
-                    // 恢复原状态
-                    glb_fpga.clearInst(x, y);
+                    glb_fpga.clearInst(x, y); // 恢复原状态
                     selectedInst->setPosition(-1, -1);
                 }
             }
         }
 
-        // 3. 将模块放置在最优位置
+        // 将模块放置在最优位置
         glb_fpga.addInst(bestPosition.first, bestPosition.second, selectedInst);
         selectedInst->setPosition(bestPosition.first, bestPosition.second);
 
-        // 从未布局集合中移除
-        unplacedModules.erase(selectedModule);
+        unplacedModules.erase(selectedModule); // 从未布局集合中移除
     }
 
     std::printf("[INFO] Initial placement completed.\n");
 }
 
+/**
+ * Solution::myplacementAlgorithm
+ * 功能：基于模拟退火算法优化模块布局，最小化总线长。
+ * 参数：
+ * - i_file_name: 输出文件名，用于保存最终布局结果。
+ * 逻辑：
+ * 1. 初始化温度、降温速率和迭代次数。
+ * 2. 在每个温度下，随机选择模块进行交换或移动，计算新的总线长。
+ * 3. 根据 Metropolis 准则决定是否接受新解。
+ * 4. 降温并重复迭代，直到温度低于阈值。
+ * 5. 保存最优解并恢复到全局状态。
+ */
 void Solution::myplacementAlgorithm(std::string i_file_name) {
-    printWireLength();
-    // 初始化参数
+    printWireLength(); // 输出初始总线长
     double T = 1000.0; // 初始温度
     double alpha = 0.98; // 降温速率
     int maxIter = 1000; // 每个温度下的最大迭代次数
     double T_min = 1e-5; // 最低温度
 
-    // 初始化随机数种子
-    std::srand(std::time(nullptr));
+    std::srand(std::time(nullptr)); // 初始化随机数种子
 
-    // 计算初始总线长
-    int currentWireLength = reportWireLength();
-    int bestWireLength = currentWireLength;
+    int currentWireLength = reportWireLength(); // 计算初始总线长
+    int bestWireLength = currentWireLength;     // 保存当前最优总线长
 
-    // 保存当前最优解
-    std::map<int, std::pair<int, int>> bestSolution;
+    std::map<int, std::pair<int, int>> bestSolution; // 保存当前最优解
 
     while (T > T_min) {
         std::printf("[INFO] Current temperature: %.2f\n", T);
         for (int iter = 0; iter < maxIter; ++iter) {
-            bool doSwap = (std::rand() % 2 == 0);
+            bool doSwap = (std::rand() % 2 == 0); // 随机选择交换或移动操作
             if (doSwap) {
                 // 执行交换操作
                 Instance* inst1 = nullptr;
                 Instance* inst2 = nullptr;
-        
-                // 随机选择两个未固定的模块
+
                 do {
                     int instId1 = std::rand() % glb_inst_map.size();
                     int instId2 = std::rand() % glb_inst_map.size();
                     inst1 = glb_inst_map[instId1];
                     inst2 = glb_inst_map[instId2];
-                } while (inst1->isFixed() || inst2->isFixed() || inst1 == inst2);
-        
-                // 保存当前模块的位置
+                } while (inst1->isFixed() || inst2->isFixed() || inst1 == inst2); // 确保模块未固定且不同
+
                 auto pos1 = inst1->getPosition();
                 auto pos2 = inst2->getPosition();
-        
-                // 交换位置
-                glb_fpga.clearInst(pos1.first, pos1.second);
+
+                glb_fpga.clearInst(pos1.first, pos1.second); // 清除原位置
                 glb_fpga.clearInst(pos2.first, pos2.second);
-        
-                glb_fpga.addInst(pos1.first, pos1.second, inst2);
+
+                glb_fpga.addInst(pos1.first, pos1.second, inst2); // 交换位置
                 glb_fpga.addInst(pos2.first, pos2.second, inst1);
-        
+
                 inst1->setPosition(pos2.first, pos2.second);
                 inst2->setPosition(pos1.first, pos1.second);
-        
-                // 计算新的总线长
-                int newWireLength = reportWireLength();
+
+                int newWireLength = reportWireLength(); // 计算新的总线长
                 int delta = newWireLength - currentWireLength;
-        
-                // 判断是否接受新解
+
                 if (delta < 0 || (std::exp(-delta / T) > (double)std::rand() / RAND_MAX)) {
-                    currentWireLength = newWireLength;
+                    currentWireLength = newWireLength; // 接受新解
                     if (currentWireLength < bestWireLength) {
                         bestWireLength = currentWireLength;
                         bestSolution.clear();
@@ -149,15 +156,15 @@ void Solution::myplacementAlgorithm(std::string i_file_name) {
                     // 恢复原位置
                     glb_fpga.clearInst(pos1.first, pos1.second);
                     glb_fpga.clearInst(pos2.first, pos2.second);
-        
+
                     glb_fpga.addInst(pos1.first, pos1.second, inst1);
                     glb_fpga.addInst(pos2.first, pos2.second, inst2);
-        
+
                     inst1->setPosition(pos1.first, pos1.second);
                     inst2->setPosition(pos2.first, pos2.second);
                 }
             } else {
-                // 随机选择一个模块
+                // 随机选择一个模块进行移动
                 Instance* inst = nullptr;
                 int attempts = 0;
                 do {
@@ -166,36 +173,27 @@ void Solution::myplacementAlgorithm(std::string i_file_name) {
                     attempts++;
                     if (attempts > glb_inst_map.size()) {
                         std::printf("[ERROR] All instances are fixed. Cannot proceed.\n");
-                        return; // 或者跳出当前温度的迭代
+                        return;
                     }
                 } while (inst->isFixed());
-        
-                // 保存当前模块的位置
+
                 auto oldPos = inst->getPosition();
-        
-                // 随机生成新位置，确保位置为空
+
                 int newX, newY;
                 do {
                     newX = std::rand() % glb_fpga.getSizeX();
                     newY = std::rand() % glb_fpga.getSizeY();
-                } while (glb_fpga.getBlock(newX, newY)->getInstsCount() != 0);
-        
-                // 尝试移动模块
-                // std::printf("[INFO] Clearing instance %d at (%d, %d)\n", inst->getInstId(), oldPos.first, oldPos.second);
-                glb_fpga.clearInst(oldPos.first, oldPos.second);
-        
-                //std::printf("[DEBUG] Adding instance %d to (%d, %d)\n", inst->getInstId(), newX, newY);
-                glb_fpga.addInst(newX, newY, inst);
+                } while (glb_fpga.getBlock(newX, newY)->getInstsCount() != 0); // 确保新位置为空
 
+                glb_fpga.clearInst(oldPos.first, oldPos.second); // 清除原位置
+                glb_fpga.addInst(newX, newY, inst);              // 移动到新位置
                 inst->setPosition(newX, newY);
-        
-                // 计算新的总线长
-                int newWireLength = reportWireLength();
+
+                int newWireLength = reportWireLength(); // 计算新的总线长
                 int delta = newWireLength - currentWireLength;
-        
-                // 判断是否接受新解
+
                 if (delta < 0 || (std::exp(-delta / T) > (double)std::rand() / RAND_MAX)) {
-                    currentWireLength = newWireLength;
+                    currentWireLength = newWireLength; // 接受新解
                     if (currentWireLength < bestWireLength) {
                         bestWireLength = currentWireLength;
                         bestSolution.clear();
@@ -203,42 +201,39 @@ void Solution::myplacementAlgorithm(std::string i_file_name) {
                             bestSolution[id] = inst->getPosition();
                         }
                         std::printf("[INFO] Found better solution with wirelength: %d\n", bestWireLength);
-                        // outputSolution(i_file_name);
                     }
                 } else {
                     // 恢复原位置
                     glb_fpga.clearInst(newX, newY);
                     glb_fpga.addInst(oldPos.first, oldPos.second, inst);
                     inst->setPosition(oldPos.first, oldPos.second);
-                    //std::printf("[INFO] Rejected move for instance %d from (%d, %d) to (%d, %d)\n", inst->getInstId(), oldPos.first, oldPos.second, newX, newY);
                 }
             }
-            
         }
-        // 降温
-        T *= alpha;
-        if (T < T_min) {
-            //std::printf("[DEBUG] Temperature dropped below minimum threshold: %.2f\n", T);
-            break;
-        }
+        T *= alpha; // 降温
     }
     restoreBestSolution(bestSolution); // 恢复最优解到全局状态
 }
 
-// 恢复最优解的正确代码
-void Solution::restoreBestSolution(const std::map<int, std::pair<int, int>>& bestSolution) {
-    // 清空所有Block中的实例
+/**
+ * Solution::restoreBestSolution
+ * 功能：恢复最优解，将模块布局恢复到最佳状态。
+ * 参数：
+ * - bestSolution: 保存的最优解，包含模块 ID 和位置。
+ */
+void Solution::restoreBestSolution(const std::map<int, std::pair<int, int>> &bestSolution)
+{
     for (int x = 0; x < glb_fpga.getSizeX(); ++x) {
         for (int y = 0; y < glb_fpga.getSizeY(); ++y) {
-            glb_fpga.clearInst(x, y);
+            glb_fpga.clearInst(x, y); // 清空所有位置
         }
     }
 
-    // 按最优解重新布局
     for (const auto& [id, pos] : bestSolution) {
         Instance* inst = glb_inst_map[id];
-        if(!inst->isFixed()) inst->setPosition(pos.first, pos.second);
-        glb_fpga.addInst(pos.first, pos.second, inst);
+        if (!inst->isFixed())
+            inst->setPosition(pos.first, pos.second);
+        glb_fpga.addInst(pos.first, pos.second, inst); // 恢复模块位置
     }
 }
 
